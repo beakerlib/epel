@@ -250,14 +250,14 @@ __INTERNAL_epelTemporarySkip() {
   if [[ -r "$cache" ]]; then
     rlLogDebug "$FUNCNAME(): using cached state in $cache"
     res=0
-  elif [[ "$1" == "set" && "$DIST" == "RedHatEnterpriseLinux" && "$REL" == "8" && $(date +%s) -lt $(date -d '2019-10-01' +%s) ]]; then
+  elif [[ "$1" == "set" && "$DIST" == "RedHatEnterpriseLinux" && "$REL" == "9" && $(date +%s) -lt $(date -d '2021-06-01' +%s) ]]; then
     rlLogDebug "$FUNCNAME(): caching the state in $cache"
     touch "$cache"
     res=0
   fi
   [[ $res -eq 0 ]] && {
-    rlLogWarning "ignoring unavailable epel repo for RHEL-8 until 2019-10-01 (epel8 GA)"
-    rlLogInfo "    extend this date if necessary until the epel8 repo is ready"
+    rlLogWarning "ignoring unavailable epel repo for RHEL-9 until 2021-06-01"
+    rlLogInfo "    extend this date if necessary until the epel9 repo is ready"
   }
   return $res
 }
