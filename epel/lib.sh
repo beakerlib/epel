@@ -250,7 +250,7 @@ __INTERNAL_epelTemporarySkip() {
   if [[ -r "$cache" ]]; then
     rlLogDebug "$FUNCNAME(): using cached state in $cache"
     res=0
-  elif [[ "$1" == "set" && "$DIST" == "RedHatEnterpriseLinux" && "$REL" == "9" && $(date +%s) -lt $(date -d '2021-06-01' +%s) ]]; then
+  elif [[ "$1" == "set" && "$DIST" == "rhel" && "$REL" == "9" && $(date +%s) -lt $(date -d '2021-06-01' +%s) ]]; then
     rlLogDebug "$FUNCNAME(): caching the state in $cache"
     touch "$cache"
     res=0
