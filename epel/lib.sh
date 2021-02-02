@@ -61,6 +61,7 @@ Or use I<epelIsAvailable> to check actual availability of the epel repo.
 
 
 epelRepoFiles=''
+epelInternalRepoFile=/etc/yum.repos.d/epel-internal.repo
 __INTERNAL_epel_curl="curl --fail --location --retry-delay 3 --retry-max-time 3600 --retry 3 --connect-timeout 20 --max-time 1800 --insecure -o"
 rlIsRHEL '<8' || __INTERNAL_epel_curl="curl --fail --location --retry-connrefused --retry-delay 3 --retry-max-time 3600 --retry 3 --connect-timeout 20 --max-time 1800 --insecure -o"
 : <<'=cut'
@@ -108,36 +109,38 @@ epelSetArch() {
 
 epelDisableMainRepo() {
   rlLog "disabling epel repo"
+  epelInternalIsAvailable && epelDisableRepos $epelInternalRepoFile
   yum-config-manager --disable epel
 }
 
 
 epelEnableMainRepo() {
   rlLog "enabling epel repo"
+  epelInternalIsAvailable && epelEnableRepos $epelInternalRepoFile
   yum-config-manager --enable epel
 }
 
 
 epelDisableRepos() {
-  rlLog "disabling epel repos"
-  for i in $epelRepoFiles ; do
-    rlLogDebug "processing $i"
-    rlLogDebug "  repo file before"
-    rlLogDebug "$(cat $i)"
-    sed -ri 's/enabled=1/enabled=0/' "$i"
-    rlLogDebug "  repo file after"
-    rlLogDebug "$(cat $i)"
-  done
+  epelDisableRepos "$1" 0
 }
 
 
 epelEnableRepos() {
-  rlLog "enabling epel repos"
-  for i in $epelRepoFiles ; do
+  local repos="$1"
+  local enable=1
+  if [[ -z "$2" ]]; then
+    rlLog "enabling epel repos"
+  else
+    rlLog "disabling epel repos"
+    enable=0
+  fi
+  [[ -z "$repos" ]] && repos="$epelRepoFiles"
+  for i in $repos ; do
     rlLogDebug "processing $i"
     rlLogDebug "  repo file before"
     rlLogDebug "$(cat $i)"
-    sed -ri 's/enabled=0/enabled=1/' "$i"
+    sed -ri "s/enabled=./enabled=$enable/" "$i"
     rlLogDebug "  repo file after"
     rlLogDebug "$(cat $i)"
   done
@@ -149,6 +152,11 @@ epelIsAvailable() {
 }
 
 
+epelInternalIsAvailable() {
+  [[ -s "$epelInternalRepoFile" ]]
+}
+
+
 epelyum() {
     epel yum "$@"
 }
@@ -157,6 +165,7 @@ epelyum() {
 epel() {
     local enablerepo command="$1"; shift
     epelIsAvailable && enablerepo='--enablerepo epel'
+    epelInternalIsAvailable && enablerepo+=' --enablerepo epel-internal'
     echo "actually running '$command $enablerepo $*'" >&2
     $command $enablerepo "$@"
 }
@@ -232,6 +241,7 @@ __INTERNAL_epelRepoFiles() {
   [[ -z "$epelRepoFiles" ]] && {
     epelRepoFiles="$(grep -il '\[epel[^]]*\]' /etc/yum.repos.d/*.repo | tr '\n' ' ')"
   }
+  epelInternalIsAvailable && epelRepoFiles+=" $epelInternalRepoFile"
   rlLogDebug "$FUNCNAME(): $(declare -p epelRepoFiles)"
   if [[ -n "$epelRepoFiles" ]]; then
     __INTERNAL_epelCheckRepoAvailability && __INTERNAL_epelIsAvailable=1
@@ -265,6 +275,7 @@ __INTERNAL_epelTemporarySkip() {
 
 # epelLibraryLoaded ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {{{
 epelLibraryLoaded() {
+  rlImport distribution/epel-internal
   __INTERNAL_epelIsAvailable=''
   __INTERNAL_epelTemporarySkip && return 0
   #yum repolist all 2>/dev/null | grep -q epel && {

@@ -1,15 +1,17 @@
 summary: EPEL handling
 description: |
     A beakerlib library for handling epel repo files and yum / dnf parameters.
-    
+
     A setup test which install epel-release package and set the repo disabled.
-    
+
     This test / library is designed to be used in RHEL/Fedora-like systems.
 contact: Dalibor Pospíšil <dapospis@redhat.com>
 test: ./runtest.sh
 require:
 - rpm
 - curl
+recommend:
+- library(distribution/epel-internal)
 duration: 5m
 enabled: true
 tag: []
