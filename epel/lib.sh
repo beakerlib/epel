@@ -122,7 +122,7 @@ epelEnableMainRepo() {
 
 
 epelDisableRepos() {
-  epelDisableRepos "$1" 0
+  epelEnableRepos "$1" 0
 }
 
 
