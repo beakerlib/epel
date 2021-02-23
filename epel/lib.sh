@@ -22,9 +22,9 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   library-prefix = epel
-#   library-version = 35
+#   library-version = 36
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-__INTERNAL_epel_LIB_VERSION=35
+__INTERNAL_epel_LIB_VERSION=36
 __INTERNAL_epel_LIB_NAME='distribution/epel'
 : <<'=cut'
 =pod
@@ -110,14 +110,18 @@ epelSetArch() {
 epelDisableMainRepo() {
   rlLog "disabling epel repo"
   epelInternalIsAvailable && epelDisableRepos $epelInternalRepoFile
-  yum-config-manager --disable epel
+  if epelIsAvailable; then
+    yum-config-manager --disable epel
+  fi
 }
 
 
 epelEnableMainRepo() {
   rlLog "enabling epel repo"
   epelInternalIsAvailable && epelEnableRepos $epelInternalRepoFile
-  yum-config-manager --enable epel
+  if epelIsAvailable; then
+    yum-config-manager --enable epel
+  fi
 }
 
 
