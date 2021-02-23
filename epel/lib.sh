@@ -22,9 +22,9 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   library-prefix = epel
-#   library-version = 34
+#   library-version = 35
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-__INTERNAL_epel_LIB_VERSION=34
+__INTERNAL_epel_LIB_VERSION=35
 __INTERNAL_epel_LIB_NAME='distribution/epel'
 : <<'=cut'
 =pod
@@ -242,17 +242,17 @@ EOF
 __INTERNAL_epelRepoFiles() {
   epelRepoFiles="$(rpm -ql epel-release | grep '/etc/yum.repos.d/.*\.repo' | tr '\n' ' ')"
   [[ -z "$epelRepoFiles" ]] && {
-    epelRepoFiles="$(grep -il '\[epel[^]]*\]' /etc/yum.repos.d/*.repo | tr '\n' ' ')"
+    epelRepoFiles="$(grep -il '\[epel[^]]*\]' /etc/yum.repos.d/*.repo | grep -v -- $epelInternalRepoFile | tr '\n' ' ')"
   }
+  rlLogDebug "$FUNCNAME(): $(declare -p epelRepoFiles)"
+  [[ -n "$epelRepoFiles" ]] && __INTERNAL_epelCheckRepoAvailability && __INTERNAL_epelIsAvailable=1
   epelInternalIsAvailable && epelRepoFiles+=" $epelInternalRepoFile"
   rlLogDebug "$FUNCNAME(): $(declare -p epelRepoFiles)"
-  if [[ -n "$epelRepoFiles" ]]; then
-    __INTERNAL_epelCheckRepoAvailability && __INTERNAL_epelIsAvailable=1
-    return 0
-  else
+  [[ -z "$epelRepoFiles" ]] && {
     rlLogDebug "$FUNCNAME(): no repo files found"
     return 1
-  fi
+  }
+  return 0
 }
 
 
