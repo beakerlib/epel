@@ -186,9 +186,11 @@ __INTERNAL_epelCheckRepoAvailability() {
   }
   local PYTHON PCODE
   while read -r PYTHON PCODE; do
-    which python >& /dev/null && {
+    rlLogDebug "$FUNCNAME(): trying $PYTHON -c \"$PCODE\""
+    which $PYTHON >& /dev/null && {
       vars=$($PYTHON -c "$PCODE" 2> /dev/null)
     }
+    rlLogDebug "$FUNCNAME(): $(declare -p vars)"
     [[ -n "$vars" ]] && break
   done << EOF
 /usr/libexec/platform-python import dnf, pprint; db = dnf.dnf.Base(); pprint.pprint(db.conf.substitutions,width=1)
@@ -199,7 +201,6 @@ EOF
     rlLogError "could not resolve yum repo variables"
     return 1
   fi
-  rlLogDebug "$FUNCNAME(): $(declare -p vars)"
   sed_pattern=$(echo "$vars" | grep -Eo "'[^']+':[^']+'[^']+'" | sed -r "s|'([^']+)'[^']+'([^']+)'|s/\\\\\$\1/\2/g;|" | tr -d '\n')
   sed_pattern+="s/\\\$[A-Za-z0-9_]*//g"
   rlLogDebug "$FUNCNAME(): $(declare -p sed_pattern)"
