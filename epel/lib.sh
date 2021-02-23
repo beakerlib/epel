@@ -201,7 +201,8 @@ EOF
   fi
   rlLogDebug "$FUNCNAME(): $(declare -p vars)"
   sed_pattern=$(echo "$vars" | grep -Eo "'[^']+':[^']+'[^']+'" | sed -r "s|'([^']+)'[^']+'([^']+)'|s/\\\\\$\1/\2/g;|" | tr -d '\n')
-  rlLogDebug "$(declare -p sed_pattern)"
+  sed_pattern+="s/\\\$[A-Za-z0-9_]*//g"
+  rlLogDebug "$FUNCNAME(): $(declare -p sed_pattern)"
   repo=$(grep --no-filename '^[^#]'  $epelRepoFiles | grep -v 'testing' | grep -E -m1 'baseurl|mirrorlist|metalink')
   rlLogDebug "$FUNCNAME(): $(declare -p repo)"
   [[ -z "$repo" ]] && {
