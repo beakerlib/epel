@@ -184,16 +184,18 @@ __INTERNAL_epelCheckRepoAvailability() {
     }
     rlLogDebug "$FUNCNAME(): bad cached result"
   }
-  if which python >& /dev/null; then
-    rlLogDebug "$FUNCNAME(): running python to get repo file variables substitution"
-    vars=$(python -c 'import yum, pprint; yb = yum.YumBase(); pprint.pprint(yb.conf.yumvar, width=1)' 2> /dev/null)
-  elif [[ -x /usr/libexec/platform-python ]]; then
-    rlLogDebug "$FUNCNAME(): running /usr/libexec/platform-python to get repo file variables substitution"
-    vars=$(/usr/libexec/platform-python -c 'import dnf, pprint; db = dnf.dnf.Base(); pprint.pprint(db.conf.substitutions,width=1)' 2> /dev/null)
-  elif which python3 >& /dev/null; then
-    rlLogDebug "$FUNCNAME(): running python3 to get repo file variables substitution"
-    vars=$(python3 -c 'import dnf, pprint; db = dnf.dnf.Base(); pprint.pprint(db.conf.substitutions,width=1)' 2> /dev/null)
-  else
+  local PYTHON PCODE
+  while read -r PYTHON PCODE; do
+    which python >& /dev/null && {
+      vars=$($PYTHON -c "$PCODE" 2> /dev/null)
+    }
+    [[ -n "$vars" ]] && break
+  done << EOF
+/usr/libexec/platform-python import dnf, pprint; db = dnf.dnf.Base(); pprint.pprint(db.conf.substitutions,width=1)
+python import yum, pprint; yb = yum.YumBase(); pprint.pprint(yb.conf.yumvar, width=1)
+python3 import dnf, pprint; db = dnf.dnf.Base(); pprint.pprint(db.conf.substitutions,width=1)
+EOF
+  if [[ -z "$vars" ]]; then
     rlLogError "could not resolve yum repo variables"
     return 1
   fi
