@@ -177,7 +177,7 @@ __INTERNAL_epelCheckRepoAvailability() {
   local cache="/var/tmp/beakerlib_library(distribution_epel)_available"
   [[ -r "$cache" ]] && {
     res="$(cat "$cache")"
-    rlLogDebug "$FUNCNAME(): found chached result '$res'"
+    rlLogDebug "$FUNCNAME(): found cached result '$res'"
     [[ -n "$res" ]] && {
      [[ $res -eq 0 ]] && rlLog "epel repo is accessible" || rlLog "epel repo is not accessible"
       return $res
@@ -203,7 +203,7 @@ __INTERNAL_epelCheckRepoAvailability() {
   repo=$(grep --no-filename '^[^#]'  $epelRepoFiles | grep -v 'testing' | grep -E -m1 'baseurl|mirrorlist|metalink')
   rlLogDebug "$FUNCNAME(): $(declare -p repo)"
   [[ -z "$repo" ]] && {
-    rlLogError "$FUNCNAME(): cloud not get repo URL!!!"
+    rlLogError "$FUNCNAME(): could not get repo URL!!!"
     let res++
   }
   if [[ "$repo" =~ $(echo '^([^=]+)=(.+)') ]]; then
