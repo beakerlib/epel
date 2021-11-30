@@ -285,7 +285,7 @@ __INTERNAL_epelTemporarySkip() {
 epelLibraryLoaded() {
   rlImport distribution/epel-internal
   __INTERNAL_epelIsAvailable=''
-  __INTERNAL_epelTemporarySkip && return 0
+  __INTERNAL_epelTemporarySkip set && return 0
   #yum repolist all 2>/dev/null | grep -q epel && {
   __INTERNAL_epelRepoFiles && {
     rlLog "epel repo already present"
