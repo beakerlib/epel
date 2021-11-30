@@ -22,9 +22,9 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   library-prefix = epel
-#   library-version = 36
+#   library-version = 37
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-__INTERNAL_epel_LIB_VERSION=36
+__INTERNAL_epel_LIB_VERSION=37
 __INTERNAL_epel_LIB_NAME='distribution/epel'
 : <<'=cut'
 =pod
@@ -285,6 +285,8 @@ __INTERNAL_epelTemporarySkip() {
 epelLibraryLoaded() {
   rlImport distribution/epel-internal
   __INTERNAL_epelIsAvailable=''
+  # the 'set' parameter acts as a workaround for epe-release package not containing the repo file definition
+	# can be removed once the package contains expected files
   __INTERNAL_epelTemporarySkip set && return 0
   #yum repolist all 2>/dev/null | grep -q epel && {
   __INTERNAL_epelRepoFiles && {
