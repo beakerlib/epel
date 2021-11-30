@@ -262,7 +262,7 @@ __INTERNAL_epelRepoFiles() {
 
 
 __INTERNAL_epelTemporarySkip() {
-  rlLogDebug "$FUNCNAME(): try to access the repository to check availability"
+  rlLogDebug "$FUNCNAME(): ignore until specific date (2022-01-01) for rhel9"
   local cache="/var/tmp/beakerlib_library(distribution_epel)_skip"
   local res=1
   if [[ -r "$cache" ]]; then
