@@ -22,9 +22,9 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   library-prefix = epel
-#   library-version = 37
+#   library-version = 38
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-__INTERNAL_epel_LIB_VERSION=37
+__INTERNAL_epel_LIB_VERSION=38
 __INTERNAL_epel_LIB_NAME='distribution/epel'
 : <<'=cut'
 =pod
@@ -285,14 +285,6 @@ __INTERNAL_epelTemporarySkip() {
 epelLibraryLoaded() {
   rlImport distribution/epel-internal
   __INTERNAL_epelIsAvailable=''
-  # the 'set' parameter acts as a workaround for epe-release package not containing the repo file definition
-	# can be removed once the package contains expected files
-  __INTERNAL_epelTemporarySkip set && return 0
-  #yum repolist all 2>/dev/null | grep -q epel && {
-  __INTERNAL_epelRepoFiles && {
-    rlLog "epel repo already present"
-    return 0
-  }
   local archive_used res epel_url i j u  epel
   local rel=`cat /etc/redhat-release` REL DIST DIST_LIKE
   if [[ -s /etc/os-release ]]; then
@@ -318,6 +310,14 @@ epelLibraryLoaded() {
   [[ "$REL" =~ ^[0-9]+$ ]] || {
     rlFail "wrong release format"
     return 6
+  }
+  # the 'set' parameter acts as a workaround for epe-release package not containing the repo file definition
+	# can be removed once the package contains expected files
+  __INTERNAL_epelTemporarySkip set && return 0
+  #yum repolist all 2>/dev/null | grep -q epel && {
+  __INTERNAL_epelRepoFiles && {
+    rlLog "epel repo already present"
+    return 0
   }
   if rlIsRHEL '>=6.8'; then
     PROTO='https'
