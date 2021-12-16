@@ -37,6 +37,7 @@ rlJournalStart
         rlRun "rlImport './epel'"
         if [[ ${ENABLE_EPEL} -eq 1 ]]; then
             epelEnableMainRepo
+            rlRun "yum --refresh install -y bash"
         fi
     rlPhaseEnd
 rlJournalPrintText
