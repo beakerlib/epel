@@ -34,7 +34,7 @@ ENABLE_EPEL=${ENABLE_EPEL:-"1"}
 
 rlJournalStart
     rlPhaseStartSetup
-        rlRun "rlImport 'distribution/epel'"
+        rlRun "rlImport './epel'"
         if [[ ${ENABLE_EPEL} -eq 1 ]]; then
             epelEnableMainRepo
         fi
