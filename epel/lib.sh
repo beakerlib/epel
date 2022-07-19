@@ -22,9 +22,9 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   library-prefix = epel
-#   library-version = 38
+#   library-version = 39
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-__INTERNAL_epel_LIB_VERSION=38
+__INTERNAL_epel_LIB_VERSION=39
 __INTERNAL_epel_LIB_NAME='distribution/epel'
 : <<'=cut'
 =pod
@@ -245,8 +245,11 @@ EOF
 
 
 __INTERNAL_epelRepoFiles() {
+  rlLogDebug "$FUNCNAME(): populate repoFiles from the package"
   epelRepoFiles="$(rpm -ql epel-release | grep '/etc/yum.repos.d/.*\.repo' | tr '\n' ' ')"
+  rlLogDebug "$FUNCNAME(): $(declare -p epelRepoFiles)"
   [[ -z "$epelRepoFiles" ]] && {
+    rlLogDebug "$FUNCNAME(): populate repoFiles from the repo files"
     epelRepoFiles="$(grep -il '\[epel[^]]*\]' /etc/yum.repos.d/*.repo | grep -v -- $epelInternalRepoFile | tr '\n' ' ')"
   }
   rlLogDebug "$FUNCNAME(): $(declare -p epelRepoFiles)"
@@ -313,7 +316,8 @@ epelLibraryLoaded() {
   }
   __INTERNAL_epelTemporarySkip && return 0
   #yum repolist all 2>/dev/null | grep -q epel && {
-  __INTERNAL_epelRepoFiles && {
+  __INTERNAL_epelRepoFiles
+  epelIsAvailable && {
     rlLog "epel repo already present"
     return 0
   }
