@@ -22,9 +22,9 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   library-prefix = epel
-#   library-version = 39
+#   library-version = 40
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-__INTERNAL_epel_LIB_VERSION=39
+__INTERNAL_epel_LIB_VERSION=40
 __INTERNAL_epel_LIB_NAME='distribution/epel'
 : <<'=cut'
 =pod
@@ -405,7 +405,7 @@ $epel
     __INTERNAL_epelTemporarySkip set && return 0
     return $res
   }
-  rlRun "rpm -i \"$epel_rpm\"" || {
+  rlRun "rpm --install \"$epel_rpm\" || rpm --reinstall \"$epel_rpm\"" || {
     rlLogError "could not install epel-release package"
     return 3
   }
