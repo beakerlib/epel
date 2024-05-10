@@ -22,9 +22,9 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   library-prefix = epel
-#   library-version = 40
+#   library-version = 41
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-__INTERNAL_epel_LIB_VERSION=40
+__INTERNAL_epel_LIB_VERSION=41
 __INTERNAL_epel_LIB_NAME='distribution/epel'
 : <<'=cut'
 =pod
@@ -265,19 +265,19 @@ __INTERNAL_epelRepoFiles() {
 
 
 __INTERNAL_epelTemporarySkip() {
-  rlLogDebug "$FUNCNAME(): ignore until specific date (2022-01-01) for rhel9"
+  rlLogDebug "$FUNCNAME(): ignore until specific date (2025-01-01) for rhel10"
   local cache="/var/tmp/beakerlib_library(distribution_epel)_skip"
   local res=1
   if [[ -r "$cache" ]]; then
     rlLogDebug "$FUNCNAME(): using cached state in $cache"
     res=0
-  elif [[ "$1" == "set" && "$DIST" == "rhel" && "$REL" == "9" && $(date +%s) -lt $(date -d '2022-01-01' +%s) ]]; then
+  elif [[ "$1" == "set" && "$DIST" == "rhel" && "$REL" == "10" && $(date +%s) -lt $(date -d '2025-01-01' +%s) ]]; then
     rlLogDebug "$FUNCNAME(): caching the state in $cache"
     touch "$cache"
     res=0
   fi
   [[ $res -eq 0 ]] && {
-    rlLogWarning "ignoring unavailable epel repo for RHEL-9 until 2022-01-01"
+    rlLogWarning "ignoring unavailable epel repo for RHEL-10 until 2025-01-01"
     rlLogInfo "    extend this date if necessary until the epel9 repo is ready"
   }
   return $res
