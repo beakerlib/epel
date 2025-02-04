@@ -22,9 +22,9 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   library-prefix = epel
-#   library-version = 41
+#   library-version = 42
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-__INTERNAL_epel_LIB_VERSION=41
+__INTERNAL_epel_LIB_VERSION=42
 __INTERNAL_epel_LIB_NAME='distribution/epel'
 : <<'=cut'
 =pod
@@ -177,7 +177,7 @@ epel() {
 
 __INTERNAL_epelCheckRepoAvailability() {
   rlLogDebug "$FUNCNAME(): try to access the repository to check availability"
-  local vars sed_pattern url repo type res=0
+  local vars url repo type res=0
   local cache="/var/tmp/beakerlib_library(distribution_epel)_available"
   [[ -r "$cache" ]] && {
     res="$(cat "$cache")"
@@ -205,9 +205,8 @@ EOF
     rlLogError "could not resolve yum repo variables"
     return 1
   fi
-  sed_pattern=$(echo "$vars" | grep -Eo "'[^']+':[^']+'[^']+'" | sed -r "s|'([^']+)'[^']+'([^']+)'|s/\\\\\$\1/\2/g;|" | tr -d '\n')
-  sed_pattern+="s/\\\$[A-Za-z0-9_]*//g"
-  rlLogDebug "$FUNCNAME(): $(declare -p sed_pattern)"
+  vars=$(echo "$vars" | grep -Eo "'[^']+':[^']+'[^']*'" | sed -r "s|'([^']+)'[^']+'([^']*)'|\1='\2'|")
+  rlLogDebug "$FUNCNAME(): $(declare -p vars)"
   repo=$(grep --no-filename '^[^#]'  $epelRepoFiles | grep -v 'testing' | grep -E -m1 'baseurl|mirrorlist|metalink')
   rlLogDebug "$FUNCNAME(): $(declare -p repo)"
   [[ -z "$repo" ]] && {
@@ -216,7 +215,7 @@ EOF
   }
   if [[ "$repo" =~ $(echo '^([^=]+)=(.+)') ]]; then
     type="${BASH_REMATCH[1]}"
-    url="$(echo "${BASH_REMATCH[2]}" | sed -r "$sed_pattern")"
+    url="$( eval "$vars; echo \"${BASH_REMATCH[2]}\""; )"
     rlLogDebug "$FUNCNAME(): $(declare -p type)"
     rlLogDebug "$FUNCNAME(): $(declare -p url)"
     case $type in
