@@ -197,16 +197,14 @@ __INTERNAL_epelCheckRepoAvailability() {
     rlLogDebug "$FUNCNAME(): $(declare -p vars)"
     [[ -n "$vars" ]] && break
   done << EOF
-/usr/libexec/platform-python import dnf, pprint; db = dnf.dnf.Base(); pprint.pprint(db.conf.substitutions,width=1)
-python import yum, pprint; yb = yum.YumBase(); pprint.pprint(yb.conf.yumvar, width=1)
-python3 import dnf, pprint; db = dnf.dnf.Base(); pprint.pprint(db.conf.substitutions,width=1)
+/usr/libexec/platform-python import dnf; print("\n".join("{0}='{1}'".format(k,v) for k,v in dnf.dnf.Base().conf.substitutions.items()))
+python import yum; print("\n".join("{0}='{1}'".format(k,v) for k,v in yum.YumBase().conf.yumvar.items()))
+python3 import dnf; print("\n".join("{0}='{1}'".format(k,v) for k,v in dnf.dnf.Base().conf.substitutions.items()))
 EOF
   if [[ -z "$vars" ]]; then
     rlLogError "could not resolve yum repo variables"
     return 1
   fi
-  vars=$(echo "$vars" | grep -Eo "'[^']+':[^']+'[^']*'" | sed -r "s|'([^']+)'[^']+'([^']*)'|\1='\2'|")
-  rlLogDebug "$FUNCNAME(): $(declare -p vars)"
   repo=$(grep --no-filename '^[^#]'  $epelRepoFiles | grep -v 'testing' | grep -E -m1 'baseurl|mirrorlist|metalink')
   rlLogDebug "$FUNCNAME(): $(declare -p repo)"
   [[ -z "$repo" ]] && {
