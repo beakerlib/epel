@@ -10,8 +10,6 @@ test: ./runtest.sh
 require:
 - rpm
 - curl
-recommend:
-- library(distribution/epel-internal)
 duration: 5m
 enabled: true
 tag: []
